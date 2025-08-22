@@ -1,14 +1,25 @@
+
 "use client";
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -31,7 +42,11 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [role, setRole] = useState<UserRole>('student');
+  const [isResetDialogOpen, setResetDialogOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+
   const router = useRouter();
   const { toast } = useToast();
 
@@ -42,6 +57,36 @@ export function LoginForm() {
       password: '',
     },
   });
+
+  const handlePasswordReset = async () => {
+    if (!resetEmail) {
+      toast({
+        variant: "destructive",
+        title: 'Email Required',
+        description: 'Please enter your email address to reset your password.',
+      });
+      return;
+    }
+    setResetLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      toast({
+        title: 'Password Reset Email Sent',
+        description: 'Please check your inbox for instructions to reset your password.',
+      });
+      setResetDialogOpen(false);
+    } catch (error: any) {
+      console.error("Password Reset Error:", error);
+      toast({
+        variant: "destructive",
+        title: 'Password Reset Failed',
+        description: error.message || 'An unexpected error occurred.',
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -77,83 +122,90 @@ export function LoginForm() {
     }
   }
 
+  const renderForm = () => (
+     <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder={`${role}@example.edu`} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center justify-between">
+                    <FormLabel>Password</FormLabel>
+                     <Dialog open={isResetDialogOpen} onOpenChange={setResetDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button type="button" variant="link" className="p-0 h-auto text-xs" onClick={() => setResetEmail(form.getValues('email'))}>
+                                Forgot Password?
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Reset Password</DialogTitle>
+                                <DialogDescription>
+                                    Enter your email address below and we'll send you a link to reset your password.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-2 py-4">
+                                <Label htmlFor="reset-email">Email</Label>
+                                <Input 
+                                    id="reset-email" 
+                                    type="email"
+                                    placeholder="your.email@example.com"
+                                    value={resetEmail} 
+                                    onChange={(e) => setResetEmail(e.target.value)} 
+                                />
+                            </div>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button type="button" variant="secondary">Cancel</Button>
+                                </DialogClose>
+                                <Button type="button" onClick={handlePasswordReset} disabled={resetLoading}>
+                                    {resetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Send Reset Link
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+                <FormControl>
+                  <Input type="password" placeholder="••••••••" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full" size="lg" disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Login as {role.charAt(0).toUpperCase() + role.slice(1)}
+          </Button>
+        </form>
+      </Form>
+  );
+
   return (
-    <Tabs value={role} onValueChange={(value) => setRole(value as UserRole)} className="w-full">
+    <Tabs value={role} onValueChange={(value) => { setRole(value as UserRole); form.reset(); }} className="w-full">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="student">Student</TabsTrigger>
         <TabsTrigger value="admin">Admin</TabsTrigger>
       </TabsList>
       <TabsContent value="student">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="student@example.edu" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" size="lg" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login as Student
-            </Button>
-          </form>
-        </Form>
+        {renderForm()}
       </TabsContent>
       <TabsContent value="admin">
-         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="admin@example.edu" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" size="lg" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login as Admin
-            </Button>
-          </form>
-        </Form>
+        {renderForm()}
       </TabsContent>
     </Tabs>
   );
