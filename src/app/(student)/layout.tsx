@@ -3,11 +3,10 @@
 import { useAuth } from "@/hooks/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Loader2, LayoutDashboard, Newspaper, Calendar, LogOut, Building2, User } from "lucide-react";
+import { Loader2, LayoutDashboard, Newspaper, Calendar, LogOut, User, Building2 } from "lucide-react";
 import Link from "next/link";
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const { profile, role, loading, logout, user } = useAuth();
@@ -18,7 +17,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       if (!user) {
         router.replace("/login");
       } else if (role !== "student") {
-        logout().finally(() => router.replace("/login"));
+         logout().finally(() => router.replace("/login"));
       }
     }
   }, [user, role, loading, router, logout]);
@@ -41,21 +40,24 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           </Link>
         </SidebarHeader>
         <SidebarContent>
+            <div className="px-2 py-1">
+                <div className="text-xs font-semibold uppercase text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">Student Menu</div>
+            </div>
           <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Dashboard">
-                  <Link href="/dashboard"><LayoutDashboard /><span>Dashboard</span></Link>
-                </SidebarMenuButton>
+              <SidebarMenuButton asChild tooltip="Dashboard">
+                <Link href="/dashboard"><LayoutDashboard /><span>Dashboard</span></Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Notices">
-                  <Link href="/notices"><Newspaper /><span>Notices</span></Link>
-                </SidebarMenuButton>
+              <SidebarMenuButton asChild tooltip="View Notices">
+                <Link href="/notices"><Newspaper /><span>Notices</span></Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Events">
-                  <Link href="/events"><Calendar /><span>Events</span></Link>
-                </SidebarMenuButton>
+              <SidebarMenuButton asChild tooltip="View Events">
+                <Link href="/events"><Calendar /><span>Events</span></Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
@@ -71,16 +73,16 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-16 items-center justify-between border-b bg-card px-6">
+         <header className="flex h-16 items-center justify-between border-b bg-card px-6">
             <div className="flex items-center gap-4">
                 <SidebarTrigger className="md:hidden" />
-                <h1 className="text-xl font-semibold">Dashboard</h1>
+                <h1 className="text-xl font-semibold">Student Dashboard</h1>
             </div>
             <div className="flex items-center gap-3">
-                <span className="text-sm font-medium">{profile.name}</span>
+                <span className="text-sm font-medium">{profile.name || "Student"}</span>
                 <Avatar className="h-9 w-9">
-                    <AvatarImage src={`https://api.dicebear.com/8.x/initials/svg?seed=${profile.name}`} alt={profile.name} />
-                    <AvatarFallback>{profile.name?.[0]}</AvatarFallback>
+                    <AvatarImage src={`https://api.dicebear.com/8.x/initials/svg?seed=${profile.name || "Student"}`} alt={profile.name || "Student"} />
+                    <AvatarFallback>{profile.name?.[0] || 'S'}</AvatarFallback>
                 </Avatar>
             </div>
         </header>

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { EventCard } from "@/components/student/EventCard";

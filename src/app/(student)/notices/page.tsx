@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { NoticeCard } from "@/components/student/NoticeCard";
