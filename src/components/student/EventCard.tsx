@@ -62,7 +62,9 @@ export function EventCard({ event }: { event: Event }) {
             <div className="flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center sm:gap-2">
                 <div className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {format(event.date, "PPP")}</div>
                 <span className="hidden sm:inline">•</span>
-                <div className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {event.venue}</div>
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.venue)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:underline">
+                    <MapPin className="h-3.5 w-3.5" /> {event.venue}
+                </a>
             </div>
        </div>
 
@@ -87,7 +89,9 @@ export function EventCard({ event }: { event: Event }) {
                        </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <MapPin className="h-4 w-4" />
-                            <span>{event.venue}</span>
+                            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.venue)}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                {event.venue}
+                            </a>
                         </div>
                         <p className="text-sm text-foreground">{event.description}</p>
                          {event.fileUrl && (
