@@ -25,12 +25,6 @@ export default function LoginPage() {
           Sign up
         </Link>
       </p>
-      <p className="mt-2 text-center text-sm text-muted-foreground">
-        Need an admin account?{' '}
-        <Link href="/signup/admin" className="font-semibold text-primary underline-offset-4 hover:underline">
-          Register here
-        </Link>
-      </p>
     </>
   );
 }
