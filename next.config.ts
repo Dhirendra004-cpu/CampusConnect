@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
     ],
   },
   devIndicators: {
-    buildActivity: false,
     allowedDevOrigins: [
       '*.cloudworkstations.dev',
       '*.firebase.studio',
