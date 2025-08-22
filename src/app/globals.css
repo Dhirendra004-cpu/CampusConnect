@@ -83,3 +83,8 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.grecaptcha-badge {
+  bottom: 90px !important;
+  z-index: 9999 !important;
+}
