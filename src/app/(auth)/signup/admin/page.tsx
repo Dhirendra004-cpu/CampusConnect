@@ -1,9 +1,9 @@
-import { SignupForm } from '@/components/auth/SignupForm';
+import { AdminSignupForm } from '@/components/auth/AdminSignupForm';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Building2 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function SignupPage() {
+export default function AdminSignupPage() {
   return (
     <>
       <div className="mb-8 flex items-center gap-3 text-primary">
@@ -12,23 +12,17 @@ export default function SignupPage() {
       </div>
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">Create a Student Account</CardTitle>
-          <CardDescription>Join the community and stay updated</CardDescription>
+          <CardTitle className="text-2xl font-bold tracking-tight">Create an Admin Account</CardTitle>
+          <CardDescription>Register a new administrator for the platform</CardDescription>
         </CardHeader>
         <CardContent>
-          <SignupForm />
+          <AdminSignupForm />
         </CardContent>
       </Card>
        <p className="mt-4 text-center text-sm text-muted-foreground">
         Already have an account?{' '}
         <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
           Sign in
-        </Link>
-      </p>
-       <p className="mt-2 text-center text-sm text-muted-foreground">
-        Signing up as an admin?{' '}
-        <Link href="/signup/admin" className="font-semibold text-primary underline-offset-4 hover:underline">
-          Register here
         </Link>
       </p>
     </>

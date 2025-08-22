@@ -20,9 +20,15 @@ export default function LoginPage() {
         </CardContent>
       </Card>
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        Don't have an account?{' '}
+        Don't have a student account?{' '}
         <Link href="/signup" className="font-semibold text-primary underline-offset-4 hover:underline">
           Sign up
+        </Link>
+      </p>
+      <p className="mt-2 text-center text-sm text-muted-foreground">
+        Need an admin account?{' '}
+        <Link href="/signup/admin" className="font-semibold text-primary underline-offset-4 hover:underline">
+          Register here
         </Link>
       </p>
     </>
